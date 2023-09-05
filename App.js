@@ -1,20 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import Header from "./Components/Header/Header";
+import EntryList from "./Components/Entry/EntryList";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+    const data = [
+        { id: '1', name: 'Item 1', description: 'Description 1', price: '$10' },
+        { id: '2', name: 'Item 2', description: 'Description 2', price: '$15' },
+        // Add more items as needed
+    ];
+
+    return (
+        <View style={styles.container}>
+            <StatusBar style="auto" />
+            <Header style={styles.header}></Header>
+            <EntryList style={styles.entryList} data={data}></EntryList>
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    container: {
+        flex: 1, // Make the container flex to occupy the whole screen
+        flexDirection: "column",
+    },
+    header: {
+    },
+    entryList: {
+    }
 });
