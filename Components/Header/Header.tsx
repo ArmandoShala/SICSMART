@@ -54,7 +54,7 @@ const Header = (props) => {
     const timeUntilOtherTarif = currentlyInHighTarif();
 
     return (
-        <View style={{ ...props.style, ...styles.header }}>
+        <View style={{ ...props.style, ...styles.container }}>
             <View style={styles.headerGroups}>
                 <Text style={styles.headerText}>{emojiPrice}</Text>
                 <Text style={styles.headerText}>{currTarifPriceInRp} Rp</Text>
@@ -74,20 +74,19 @@ const Header = (props) => {
 export default Header;
 
 const styles = StyleSheet.create({
-    header: {
+    container: {
+        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-
+        alignItems: "flex-end",
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        paddingBottomColor: 'black',
+        borderBottomWidth: 1,
+        backgroundColor: "#a3a3a3"
     },
     headerGroups: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        top: 70,
-        left: 0,
-        right: 50,
-        marginLeft: 20,
-        marginRight: 20,
+        alignItems: "center"
     },
     headerText: {
         fontSize: 24,
