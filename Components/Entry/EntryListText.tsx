@@ -1,15 +1,16 @@
-import React from 'react';
+import React, {Component} from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import {render} from "react-dom";
 
-const EntryListText = ({ text }) => {
+const EntryListText  = ({ text, style }) => {
     return (
         <View>
-            <Text style={styles.container}>{text}</Text>
+            <Text style={{...styles.container, ...style}}>{text}</Text>
         </View>
     );
 };
 
-export default EntryListText;
+export default EntryListText ;
 
 
 const styles = StyleSheet.create({

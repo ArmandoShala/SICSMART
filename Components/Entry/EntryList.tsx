@@ -5,9 +5,10 @@ import EntryListItem from "./EntryListItem";
 
 const getDataFromAPI = () => {
     return [
-        { id: '1', name: 'Item 1', priority: 'Description 1', startTime: "10" },
-        { id: '2', name: 'Item 2', priority: 'Description 2', startTime: "15" },
-        // Add more items as needed
+            { "id": "1", "name": "Waschmaschine", "priority": "High", "startTime": "22:00" },
+            { "id": "2", "name": "Spülmaschine", "priority": "High", "startTime": "22:30" },
+            { "id": "3", "name": "Tumbler", "priority": "Medium", "startTime": "23:45" },
+            { "id": "4", "name": "Trockner", "priority": "Low", "startTime": "03:00" }
     ];
 }
 
@@ -36,6 +37,5 @@ const styles = StyleSheet.create({
         flex: 6,
     },
     list: {
-        backgroundColor: "yellow",
     },
 });

@@ -1,10 +1,25 @@
 import React from 'react';
-import { StatusBar, StyleSheet, Text, View } from 'react-native';
+import {AppRegistry, StatusBar, StyleSheet, Text, View} from 'react-native';
 import Header from "./Components/Header/Header";
 import EntryList from "./Components/Entry/EntryList";
 import AddSection from "./Components/AddSection/AddSection";
+import CronJob from "react-native-cron-job";
+
 
 export default function App() {
+
+
+    const CronJobTask = async () => {
+
+        // Do your task here.
+
+        // Be sure to call completeTask at the end.
+        CronJob.completeTask();
+    };
+
+    AppRegistry.registerHeadlessTask('CRONJOB', () => CronJobTask);
+    AppRegistry.registerComponent("SICSMART", () => App);
+
 
     const data = [
         { id: '1', name: 'Item 1', description: 'Description 1', price: '$10' },

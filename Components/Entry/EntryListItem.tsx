@@ -4,15 +4,29 @@ import EntryListText from "./EntryListText";
 
 const calcStartTimeOfEntry = (startTime: string) =>
 {
-    return "startTime";
+    return startTime;
+}
+const translatePrioritiesToIcon = (priority: string) =>
+{
+    switch (priority) {
+        case 'High':
+            return '‼️';
+        case 'Medium':
+            return '❗';
+        case 'Low':
+            return '❕';
+        case 'None':
+        default:
+            return '';
+    }
 }
 
 const EntryListItem = ({ item }) => {
     return (
         <View style={styles.container}>
-            <EntryListText text={item.name}></EntryListText>
-            <EntryListText text={item.priority}></EntryListText>
-            <EntryListText text={calcStartTimeOfEntry(item.startTime)}></EntryListText>
+            <EntryListText style={{flex: 1}} text={item.name}></EntryListText>
+            <EntryListText style={{flex: 5}} text={translatePrioritiesToIcon(item.priority)}></EntryListText>
+            <EntryListText style={{flex: 1}} text={calcStartTimeOfEntry(item.startTime)}></EntryListText>
         </View>
     );
 };
@@ -22,12 +36,12 @@ export default EntryListItem;
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row', // Arrange values horizontally
-        justifyContent: 'space-between', // Space evenly between values
-        paddingHorizontal: 16, // Add some horizontal padding
-        paddingVertical: 8, // Add some vertical padding
-        marginBottom: 10,
-        borderBottomWidth: 1, // Add a border between items (optional)
-        borderBottomColor: '#ccc', // Border color (optional)
+        flexDirection: 'row',
+        justifyContent: "space-between",
+        padding: 8,
+        margin: 7,
+        height: 100,
+        borderWidth: 1.2, // Add a border between items (optional)
+        borderColor: 'lightgray', // Border color (optional)
     },
 });

@@ -1,37 +1,53 @@
-import React, {useState} from 'react';
-import {Text, View, StyleSheet, TextInput} from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import React, {useState, useRef} from 'react';
+import {Text, View, StyleSheet, TextInput, Button, TouchableOpacity, Pressable} from 'react-native';
 import RNDateTimePicker from "@react-native-community/datetimepicker";
+import SelectDropdown from 'react-native-select-dropdown'
+
+
+const priorityValues = ["High", "Medium", "Low", "None"]
+
 
 const AddSection = (props) => {
     const [nameEntry, setNameEntry] = useState('');
 
-    const val = new Date();
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
-    const [items, setItems] = useState([
-        {label: 'Apple', value: 'apple'},
-        {label: 'Banana', value: 'banana'}
-    ]);
 
     return (
         <View style={{ ...props.style, ...styles.container }}>
             <TextInput
-                style={styles.container}
+                style={styles.input}
                 placeholder="Wobei Geldsparen?"
                 onChangeText={newText => setNameEntry(newText)}
                 defaultValue={nameEntry}
             />
-            <DropDownPicker
-                open={open}
-                value={value}
-                items={items}
-                setOpen={setOpen}
-                setValue={setValue}
-                setItems={setItems}
+            <SelectDropdown
+                data={priorityValues}
+                defaultButtonText={"Prio"}
+                search={true}
+                buttonStyle={styles.SelectDropdownButton}
+                onSelect={(selectedItem, index) => {
+                    alert(selectedItem + " " + index)
+                }}
+                buttonTextAfterSelection={(selectedItem, index) => {
+                    // text represented after item is selected
+                    // if data array is an array of objects then return selectedItem.property to render after item is selected
+                    return selectedItem
+                }}
+                rowTextForSelection={(item, index) => {
+                    // text represented for each item in dropdown
+                    // if data array is an array of objects then return item.property to represent item in dropdown
+                    return item
+                }}
             />
-            <RNDateTimePicker mode="time"  value={val}/>
+
+            <RNDateTimePicker mode="time"
+                              style={styles.RNDateTimePicker}
+                              value={new Date(Date.now() + 10 * 36e5 )}/>
+            <Pressable style={styles.pressable}>
+                <Text style={styles.text}>
+                    +
+                </Text>
+            </Pressable>
         </View>
     );
 };
@@ -42,15 +58,47 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-        alignSelf: "center",
-        paddingVertical: 20,
-        paddingHorizontal: 30,
-        backgroundColor: "red",
+        justifyContent: 'space-between',
+        alignSelf: "flex-start",
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        paddingBottomColor: 'black',
+        backgroundColor: "lightgreen"
     },
     input: {
+        flex: 4,
         height: 40,
-        margin: 12,
         borderWidth: 1,
-        padding: 10,
+        borderColor: "gray",
+        backgroundColor: "white",
+        padding: 5,
+        margin: 5,
     },
+    SelectDropdownButton: {
+        flex: 2,
+        height: 40,
+        paddingLeft: 5,
+        padding: 5,
+        margin: 5,
+    },
+    RNDateTimePicker: {
+        flex: 2,
+        height: 50,
+    },
+    pressable: {
+        flex: 1,
+        height: 45,
+        padding: 5,
+        margin: 5,
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'green',
+    },
+    text: {
+        fontSize: 29,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+
 });
