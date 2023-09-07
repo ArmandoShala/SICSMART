@@ -2,7 +2,6 @@ import React from 'react';
 import {AppRegistry, StatusBar, StyleSheet, Text, View} from 'react-native';
 import Header from "./Components/Header/Header";
 import EntryList from "./Components/Entry/EntryList";
-import AddSection from "./Components/AddSection/AddSection";
 
 
 export default function App() {
@@ -19,7 +18,6 @@ export default function App() {
             <StatusBar style="auto" />
             <Header style={styles.header}></Header>
             <EntryList style={styles.entryList} data={data}></EntryList>
-            <AddSection></AddSection>
         </View>
     );
 }
