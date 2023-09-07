@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
 import moment from 'moment-timezone';
@@ -97,11 +97,20 @@ export const convertPriceRpToFr = (priceInRp) => {
 }
 
 const Header = (props) => {
-//    const data = require('./data.json');
     const currTarifPriceInRp = getCurrentTariffPrice(new Date());
-    const savedCashMoney = 302;
+
+    // Define the savedCashMoney state variable and a function to update it
+    const [savedCashMoney, setSavedCashMoney] = useState(0);
+
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();
+
+    // Function to increment savedCashMoney
+    const incrementSavedCashMoney = (x) => {
+        const updatedCashMoney = savedCashMoney + x; // You can adjust the increment value as needed
+        setSavedCashMoney(updatedCashMoney);
+    };
+
 
     return (
         <View style={{ ...props.style, ...styles.container }}>

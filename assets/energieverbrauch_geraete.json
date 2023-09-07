@@ -1,0 +1,9 @@
+{
+  "GeräteVerbrauch": {
+    "Waschmaschine": 0.75,
+    "Trockner": 2.0,
+    "Geschirrspüler": 0.78,
+    "Auto": 52.5,
+    "Handy": 3.65
+  }
+}
