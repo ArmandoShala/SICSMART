@@ -1,32 +1,30 @@
-import React, {useState, useRef} from 'react';
-import {Text, View, StyleSheet, TextInput, Button, TouchableOpacity, Pressable} from 'react-native';
-import RNDateTimePicker from "@react-native-community/datetimepicker";
+import React, {useState} from 'react';
+import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
-
-
-const priorityValues = ["High", "Medium", "Low", "None"]
+import {addEntry, EntryPriority} from "../Entry/Entry"
 
 
 const AddSection = (props) => {
-    const [nameEntry, setNameEntry] = useState('');
+    const [entryName, setEntryName] = useState('');
+    const [entryDuration, setEntryDuration] = useState('');
+    let selectedPriority: EntryPriority = EntryPriority.None;
 
-    const [open, setOpen] = useState(false);
 
     return (
         <View style={{ ...props.style, ...styles.container }}>
             <TextInput
-                style={styles.input}
+                style={styles.entryName}
                 placeholder="Wobei Geldsparen?"
-                onChangeText={newText => setNameEntry(newText)}
-                defaultValue={nameEntry}
+                onChangeText={newText => setEntryName(newText)}
+                defaultValue={entryName}
             />
             <SelectDropdown
-                data={priorityValues}
+                data={Object.values(EntryPriority)}
                 defaultButtonText={"Prio"}
                 search={true}
                 buttonStyle={styles.SelectDropdownButton}
                 onSelect={(selectedItem, index) => {
-                    alert(selectedItem + " " + index)
+                    selectedPriority = selectedItem;
                 }}
                 buttonTextAfterSelection={(selectedItem, index) => {
                     // text represented after item is selected
@@ -40,10 +38,15 @@ const AddSection = (props) => {
                 }}
             />
 
-            <RNDateTimePicker mode="time"
-                              style={styles.RNDateTimePicker}
-                              value={new Date(Date.now() + 10 * 36e5 )}/>
-            <Pressable style={styles.pressable}>
+            <TextInput
+                style={styles.entryDuration}
+                placeholder="2h30m"
+                onChangeText={newText => setEntryDuration(newText)}
+                defaultValue={entryDuration}
+            />
+            <Pressable
+                style={styles.pressable}
+                       onPress={() => addEntry(entryName, selectedPriority, entryDuration)}>
                 <Text style={styles.text}>
                     +
                 </Text>
@@ -65,8 +68,17 @@ const styles = StyleSheet.create({
         paddingBottomColor: 'black',
         backgroundColor: "lightgreen"
     },
-    input: {
+    entryName: {
         flex: 4,
+        height: 40,
+        borderWidth: 1,
+        borderColor: "gray",
+        backgroundColor: "white",
+        padding: 5,
+        margin: 5,
+    },
+    entryDuration: {
+        flex: 2,
         height: 40,
         borderWidth: 1,
         borderColor: "gray",
