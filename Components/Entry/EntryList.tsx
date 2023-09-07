@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import EntryListItem from './EntryListItem';
 import SelectDropdown from 'react-native-select-dropdown';
 
@@ -12,9 +12,10 @@ export const getEntries = () => {
     ];
 };
 
+const deviceConsumptionData = require('../../assets/energieverbrauch_geraete.json');
+
 const EntryList = () => {
     const [entryName, setEntryName] = useState('');
-    const [entryDuration, setEntryDuration] = useState('');
     const [selectedPriority, setSelectedPriority] = useState(EntryPriority.None);
     const [data, setData] = useState(getEntries());
 
@@ -23,7 +24,8 @@ const EntryList = () => {
         const entry = {
             name: entryName,
             priority: selectedPriority,
-            startTime: getRandomStartTime(entryDuration),
+            startTime: calcRandomStartTime(entryName),
+            savings: calcConsumption(entryName)
         };
 
         // Update the state with the new entry
@@ -31,37 +33,46 @@ const EntryList = () => {
 
         // Clear the input fields
         setEntryName('');
-        setEntryDuration('');
         setSelectedPriority(EntryPriority.None);
     };
 
-    const getRandomStartTime = (duration) => {
+    const calcRandomStartTime = (entryName) => {
         // Calculate random start time logic here
         // Replace this with your actual logic
-        const entryDurationSplitted = duration.split('h');
+        const entryDurationSplitted = "2h30m".split('h');
         const randomHour = parseInt(entryDurationSplitted[0]) + 5;
         const randomMinute = parseInt(entryDurationSplitted[1].replace('m', '')) + 12;
         return `${randomHour}:${randomMinute}`;
     };
+    const calcConsumption = (entryName) => {
+        return deviceConsumptionData.GeräteVerbrauch[entryName]
+    };
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={data}
-                style={styles.list}
-                renderItem={({ item }) => <EntryListItem item={item} />}
-            />
+            <View style={{ ...styles.flatListContainer }}>
+                <FlatList
+                    data={data}
+                    renderItem={({ item }) => <EntryListItem item={item} />}
+                />
+            </View>
             <View style={{ ...styles.addSectionContainer }}>
-                <TextInput
-                    style={styles.entryName}
-                    placeholder="Wobei Geldsparen?"
-                    onChangeText={(newText) => setEntryName(newText)}
-                    value={entryName}
+                <SelectDropdown
+                    data={Object.values(Object.keys(deviceConsumptionData.GeräteVerbrauch))}
+                    defaultButtonText={'Gerät...'}
+                    search={true}
+                    buttonStyle={styles.SelectDropdownButton}
+                    onSelect={(selectedItem) => setEntryName(selectedItem)}
+                    buttonTextAfterSelection={(selectedItem) => {
+                        return selectedItem;
+                    }}
+                    rowTextForSelection={(item) => {
+                        return item;
+                    }}
                 />
                 <SelectDropdown
                     data={Object.values(EntryPriority)}
-                    defaultButtonText={'Prio'}
-                    search={true}
+                    defaultButtonText={'Prio...'}
                     buttonStyle={styles.SelectDropdownButton}
                     onSelect={(selectedItem) => setSelectedPriority(selectedItem)}
                     buttonTextAfterSelection={(selectedItem) => {
@@ -72,12 +83,6 @@ const EntryList = () => {
                     }}
                 />
 
-                <TextInput
-                    style={styles.entryDuration}
-                    placeholder="2h30m"
-                    onChangeText={(newText) => setEntryDuration(newText)}
-                    value={entryDuration}
-                />
                 <Pressable style={styles.pressable} onPress={addEntry}>
                     <Text style={styles.addSectionText}>+</Text>
                 </Pressable>
@@ -92,7 +97,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 6,
     },
-    list: {},
+    flatListContainer: {
+        flex: 5,
+    },
     addSectionContainer: {
         flex: 1,
         flexDirection: 'row',
