@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Pressable, StyleSheet, Text, TextInput, View} from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown'
-import {addEntry, EntryPriority} from "../Entry/Entry"
+import {addEntry, EntryPriority} from "../Entry/EntryList"
 
 
 const AddSection = (props) => {
