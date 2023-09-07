@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet, Modal, Pressable} from 'react-native';
 import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
 import moment from 'moment-timezone';
+import HeaderItem from "./HeaderItem";
 
 const getEmojiFromPrice = (currPrice) => {
     //todo: get the value for currPrice from JSON
@@ -50,13 +51,10 @@ export const currentlyInHighTarif = () => {
             nextHighTarifStartMoment.add(1, 'day'); // Move to the next day
         }
         const diff = moment.duration(nextHighTarifStartMoment.diff(currTime));
-        const differenceHours = diff.hours();
-        const differenceMin = diff.minutes();
+        const differenceHours = diff.hours().toString().padStart(2, '0');
+        const differenceMin = diff.minutes().toString().padStart(2, '0');
 
-        // Format minutes with leading zeros
-        const formattedMin = differenceMin.toString().padStart(2, '0');
-
-        return `${differenceHours}:${formattedMin}`;
+        return `${differenceHours}:${differenceMin}`;
     }
 };
 
@@ -107,6 +105,7 @@ const Header = (props) => {
 
     // Define the savedCashMoney state variable and a function to update it
     const [savedCashMoney, setSavedCashMoney] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
 
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();
@@ -121,16 +120,13 @@ const Header = (props) => {
     return (
         <View style={{ ...props.style, ...styles.container }}>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>{emojiPrice}</Text>
-                <Text style={styles.headerText}>{currTarifPriceInRp} Rp</Text>
+                <HeaderItem props={styles.headerGroups} emoji={emojiPrice} text={currTarifPriceInRp + " Rp"} modalExplanation={"Aktueller Tarif"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>🤑</Text>
-                <Text style={styles.headerText}>{savedCashMoney} Fr</Text>
+                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={savedCashMoney + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>🕤</Text>
-                <Text style={styles.headerText}>{timeUntilOtherTarif}</Text>
+                <HeaderItem props={styles.headerGroups} emoji={"🕤"} text={timeUntilOtherTarif} modalExplanation={"Stunden bis zum Tarifwechsel"}></HeaderItem>
             </View>
         </View>
     );
@@ -146,8 +142,6 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingVertical: 10,
         paddingHorizontal: 30,
-        paddingBottomColor: 'black',
-        borderBottomWidth: 1,
         backgroundColor: "#a3a3a3"
     },
     headerGroups: {
@@ -155,5 +149,26 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 24,
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
 });

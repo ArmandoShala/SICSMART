@@ -55,7 +55,7 @@ const EntryList = () => {
                     renderItem={({ item }) => <EntryListItem item={item} />}
                 />
             </View>
-            <View style={{ ...styles.addSectionContainer }}>
+            <View style={ styles.addSectionContainer }>
                 <SelectDropdown
                     data={Object.values(Object.keys(deviceConsumptionData.GeräteVerbrauch))}
                     defaultButtonText={'Gerät...'}
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
         flex: 6,
     },
     flatListContainer: {
-        flex: 5,
+        flex: 8,
     },
     addSectionContainer: {
         flex: 1,
@@ -106,8 +106,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         paddingVertical: 5,
         paddingHorizontal: 10,
-        paddingBottomColor: 'black',
-        backgroundColor: 'lightgreen',
+        backgroundColor: "#a3a3a3",
     },
     entryName: {
         flex: 4,
