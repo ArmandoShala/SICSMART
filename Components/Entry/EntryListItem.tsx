@@ -1,6 +1,7 @@
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import EntryListText from "./EntryListText";
+import {Hochtarif, Niedertarif} from "../Header/Header";
 
 const calcStartTimeOfEntry = (startTime: string) => {
     return startTime;
@@ -19,10 +20,14 @@ const translatePrioritiesToIcon = (priority: string) => {
     }
 }
 
+const calcSavings = (item) => {
+    const deviceConsumptionData = require('../../assets/energieverbrauch_geraete.json');
+    const precision = Math.pow(10, 2);
+    return Math.round(deviceConsumptionData.GeräteVerbrauch[item.name] * (Hochtarif - Niedertarif) * precision) / precision + "Rp/kWh"
+}
+
 const EntryListItem = ({item}) => {
     return (
-
-
         <View style={styles.container}>
             <View style={styles.row}>
                 <EntryListText style={{}} text={item.name}></EntryListText>
@@ -30,7 +35,7 @@ const EntryListItem = ({item}) => {
                 <EntryListText style={{}} text={calcStartTimeOfEntry(item.startTime)}></EntryListText>
             </View>
             <View style={styles.row}>
-                <EntryListText style={{}} text={"todo savings"}></EntryListText>
+                <EntryListText style={{}} text={calcSavings(item)}></EntryListText>
                 <EntryListText style={{}} text={"todo cancel"}></EntryListText>
                 <EntryListText style={{}} text={"todo start"}></EntryListText>
             </View>

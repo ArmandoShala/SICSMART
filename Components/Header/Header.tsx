@@ -3,11 +3,13 @@ import { Text, View, StyleSheet } from 'react-native';
 import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
 import moment from 'moment-timezone';
 
-export const getEmojiFromPrice = (currPrice) => {
+const getEmojiFromPrice = (currPrice) => {
     //todo: get the value for currPrice from JSON
     return currPrice > 15 ? '📈' : '📉';
 };
 
+export let Hochtarif = undefined;
+export let Niedertarif = undefined;
 
 export const currentlyInHighTarif = () => {
     const highTarifData = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Zeit"];
@@ -83,6 +85,8 @@ export const getCurrentTariffPrice = (currentDateTime: Date) => {
     if (tariffDetails) {
         // Get the tariff price from the details
         const tariffPrice = tariffDetails["Rp./kWh"];
+        Hochtarif = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Rp./kWh"];
+        Niedertarif = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Niedertarif"]["Rp./kWh"];
         return tariffPrice;
     }
 
@@ -92,12 +96,14 @@ export const getCurrentTariffPrice = (currentDateTime: Date) => {
 
 
 // Function to check if currently in high tariff (HT)
-export const convertPriceRpToFr = (priceInRp) => {
+ const convertPriceRpToFr = (priceInRp) => {
     return `${priceInRp / 100}Fr`;
 }
 
+export const currTarifPriceInRp = getCurrentTariffPrice(new Date());
+
+
 const Header = (props) => {
-    const currTarifPriceInRp = getCurrentTariffPrice(new Date());
 
     // Define the savedCashMoney state variable and a function to update it
     const [savedCashMoney, setSavedCashMoney] = useState(0);
