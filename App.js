@@ -17,7 +17,7 @@ export default function App() {
         CronJob.completeTask();
     };
 
-    AppRegistry.registerHeadlessTask('CRONJOB', () => CronJobTask);
+    //AppRegistry.registerHeadlessTask('CRONJOB', () => CronJobTask);
     AppRegistry.registerComponent("SICSMART", () => App);
 
 

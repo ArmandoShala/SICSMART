@@ -1,54 +1,104 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
+import moment from 'moment-timezone';
 
 export const getEmojiFromPrice = (currPrice) => {
     //todo: get the value for currPrice from JSON
     return currPrice > 15 ? '📈' : '📉';
 };
 
+
 export const currentlyInHighTarif = () => {
-    //todo: get the value for time to next tarif from JSON
-    const highTarifStart = "06:00:00".split(":");
-    const highTarifEnd = "22:00:00".split(":");
+    const highTarifData = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Zeit"];
+    const highTarifStartWeekday = highTarifData["Montag bis Freitag"]["Startzeit"];
+    const highTarifEndWeekday = highTarifData["Montag bis Freitag"]["Endzeit"];
+    const highTarifStartWeekend = highTarifData["Samstag und Sonntag"]["ganztägig"];
 
-    let differenceHours = 0;
-    let differenceMin = 0;
+    //const currTime = moment(); // Get the current time
+    const currTime = moment(); // Get the current time
 
-    const currTime = new Date();
-    if(isCurrentlyHighTarif(highTarifStart, highTarifEnd)){
-        // we are in high tarif, so calc the time to the end
-        differenceHours = parseInt(highTarifEnd[0]) - currTime.getHours() - 1; // subtrack one because that hour is represented in the minutes
-        differenceMin = 60 - parseInt(highTarifEnd[1]);
-//        alert(parseInt(highTarifEnd[0]) + " " + currTime.getHours() + " " + differenceHours)
-//        alert(parseInt(highTarifEnd[1]) + " " + currTime.getMinutes() + " " + differenceMin)
+    // Check if it's a weekday (Monday to Friday)
+    const isWeekday = currTime.isoWeekday() >= 1 && currTime.isoWeekday() <= 5;
+
+    let highTarifStartMoment = moment(highTarifStartWeekday, 'HH:mm'); // Parse the start time
+    let highTarifEndMoment = moment(highTarifEndWeekday, 'HH:mm'); // Parse the end time
+
+    if (!isWeekday) {
+        // Use weekend time if it's not a weekday
+        highTarifStartMoment = moment(highTarifStartWeekend, 'HH:mm');
+        highTarifEndMoment = moment(highTarifStartWeekend, 'HH:mm');
     }
 
-    return `${differenceHours}:${differenceMin}`;
+    if (currTime.isBetween(highTarifStartMoment, highTarifEndMoment)) {
+        // We are in high tariff, so calculate the time until the next low tariff
+        const nextLowTarifStartMoment = highTarifEndMoment.clone();
+        const diff = moment.duration(nextLowTarifStartMoment.diff(currTime));
+        const differenceHours = diff.hours();
+        const differenceMin = diff.minutes();
+
+        // Format minutes with leading zeros
+        const formattedMin = differenceMin.toString().padStart(2, '0');
+
+        return `${differenceHours}:${formattedMin}`;
+    } else {
+        // Calculate the time until the next high tariff
+        const nextHighTarifStartMoment = highTarifStartMoment.clone();
+        if (nextHighTarifStartMoment.isBefore(currTime)) {
+            nextHighTarifStartMoment.add(1, 'day'); // Move to the next day
+        }
+        const diff = moment.duration(nextHighTarifStartMoment.diff(currTime));
+        const differenceHours = diff.hours();
+        const differenceMin = diff.minutes();
+
+        // Format minutes with leading zeros
+        const formattedMin = differenceMin.toString().padStart(2, '0');
+
+        return `${differenceHours}:${formattedMin}`;
+    }
 };
 
-const isCurrentlyHighTarif = (highTarifStart: string[], highTarifEnd: string[]) => {
+// Function to check the current tariff price
+export const getCurrentTariffPrice = (currentDateTime: Date) => {
+    const currentTime = moment(currentDateTime);
+    const dayOfWeek = currentTime.day();
+    const currentTimeStr = currentTime.format('HH:mm');
 
-    const now = new Date();
-    const start = new Date(now);
-    const end = new Date(now);
+    // Default to low tariff
+    let currentTariff = "Niedertarif";
 
-    const [startHours, startMinutes, startSeconds] = highTarifStart.map(Number);
-    const [endHours, endMinutes, endSeconds] = highTarifEnd.map(Number);
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        // Weekdays (Monday to Friday)
+        const highTariffStartTime = "07:00";
+        const highTariffEndTime = "20:00";
 
-    start.setHours(startHours, startMinutes, startSeconds, 0);
-    end.setHours(endHours, endMinutes, endSeconds, 0);
+        if (currentTimeStr >= highTariffStartTime && currentTimeStr <= highTariffEndTime) {
+            currentTariff = "Hochtarif";
+        }
+    }
 
-    return now >= start && now <= end;
+    // Get the tariff details from the JSON data
+    const tariffDetails = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"][currentTariff];
 
-}
+    if (tariffDetails) {
+        // Get the tariff price from the details
+        const tariffPrice = tariffDetails["Rp./kWh"];
+        return tariffPrice;
+    }
 
+    // Return a default value if tariff details are not found
+    return 0.0;
+};
+
+
+// Function to check if currently in high tariff (HT)
 export const convertPriceRpToFr = (priceInRp) => {
     return `${priceInRp / 100}Fr`;
 }
 
 const Header = (props) => {
 //    const data = require('./data.json');
-    const currTarifPriceInRp = 25;
+    const currTarifPriceInRp = getCurrentTariffPrice(new Date());
     const savedCashMoney = 302;
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();

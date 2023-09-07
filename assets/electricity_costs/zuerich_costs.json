@@ -1,0 +1,88 @@
+{
+  "Elektrizitätstarif für feste Endverbraucher": {
+    "EKZ Mixstrom": {
+      "Hochtarif": {
+        "Rp./kWh": 23.66,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      },
+      "Niedertarif": {
+        "Rp./kWh": 19.35,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      }
+    },
+    "EKZ Mixstrom mit Wärmepumpe": {
+      "Hochtarif": {
+        "Rp./kWh": 20.92,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      },
+      "Niedertarif": {
+        "Rp./kWh": 19.35,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      }
+    },
+    "EKZ Mixstrom mit untersagter Flexibilitätssteuerung": {
+      "Hochtarif": {
+        "Rp./kWh": 25.17,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      },
+      "Niedertarif": {
+        "Rp./kWh": 19.35,
+        "CHF/Mt.": 8.62,
+        "Zeit": {
+          "Montag bis Freitag": {
+            "Startzeit": "07:00",
+            "Endzeit": "20:00"
+          },
+          "Samstag und Sonntag": {
+            "ganztägig": "Niedertarif (NT)"
+          }
+        }
+      }
+    }
+  }
+}
