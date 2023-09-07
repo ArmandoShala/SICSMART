@@ -6,9 +6,9 @@ import SelectDropdown from 'react-native-select-dropdown';
 export const getEntries = () => {
     return [
         { name: 'Waschmaschine', priority: 'High', startTime: '22:00' },
-        { name: 'Spülmaschine', priority: 'High', startTime: '22:30' },
-        { name: 'Tumbler', priority: 'Medium', startTime: '23:45' },
-        { name: 'Trockner', priority: 'Low', startTime: '03:00' },
+        { name: 'Geschirrspüler', priority: 'High', startTime: '22:30' },
+        { name: 'Trockner', priority: 'Medium', startTime: '23:45' },
+        { name: 'Handy', priority: 'Low', startTime: '03:00' },
     ];
 };
 
@@ -25,7 +25,6 @@ const EntryList = () => {
             name: entryName,
             priority: selectedPriority,
             startTime: calcRandomStartTime(entryName),
-            savings: calcConsumption(entryName)
         };
 
         // Update the state with the new entry
