@@ -1,71 +1,132 @@
-import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {Text, View, StyleSheet, Modal, Pressable} from 'react-native';
+import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
+import moment from 'moment-timezone';
+import HeaderItem from "./HeaderItem";
 
-export const getEmojiFromPrice = (currPrice) => {
+const getEmojiFromPrice = (currPrice) => {
     //todo: get the value for currPrice from JSON
     return currPrice > 15 ? '📈' : '📉';
 };
 
+export let Hochtarif = undefined;
+export let Niedertarif = undefined;
+
 export const currentlyInHighTarif = () => {
-    //todo: get the value for time to next tarif from JSON
-    const highTarifStart = "06:00:00".split(":");
-    const highTarifEnd = "22:00:00".split(":");
+    const highTarifData = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Zeit"];
+    const highTarifStartWeekday = highTarifData["Montag bis Freitag"]["Startzeit"];
+    const highTarifEndWeekday = highTarifData["Montag bis Freitag"]["Endzeit"];
+    const highTarifStartWeekend = highTarifData["Samstag und Sonntag"]["ganztägig"];
 
-    let differenceHours = 0;
-    let differenceMin = 0;
+    //const currTime = moment(); // Get the current time
+    const currTime = moment(); // Get the current time
 
-    const currTime = new Date();
-    if(isCurrentlyHighTarif(highTarifStart, highTarifEnd)){
-        // we are in high tarif, so calc the time to the end
-        differenceHours = parseInt(highTarifEnd[0]) - currTime.getHours() - 1; // subtrack one because that hour is represented in the minutes
-        differenceMin = 60 - parseInt(highTarifEnd[1]);
-//        alert(parseInt(highTarifEnd[0]) + " " + currTime.getHours() + " " + differenceHours)
-//        alert(parseInt(highTarifEnd[1]) + " " + currTime.getMinutes() + " " + differenceMin)
+    // Check if it's a weekday (Monday to Friday)
+    const isWeekday = currTime.isoWeekday() >= 1 && currTime.isoWeekday() <= 5;
+
+    let highTarifStartMoment = moment(highTarifStartWeekday, 'HH:mm'); // Parse the start time
+    let highTarifEndMoment = moment(highTarifEndWeekday, 'HH:mm'); // Parse the end time
+
+    if (!isWeekday) {
+        // Use weekend time if it's not a weekday
+        highTarifStartMoment = moment(highTarifStartWeekend, 'HH:mm');
+        highTarifEndMoment = moment(highTarifStartWeekend, 'HH:mm');
     }
 
-    return `${differenceHours}:${differenceMin}`;
+    if (currTime.isBetween(highTarifStartMoment, highTarifEndMoment)) {
+        // We are in high tariff, so calculate the time until the next low tariff
+        const nextLowTarifStartMoment = highTarifEndMoment.clone();
+        const diff = moment.duration(nextLowTarifStartMoment.diff(currTime));
+        const differenceHours = diff.hours();
+        const differenceMin = diff.minutes();
+
+        // Format minutes with leading zeros
+        const formattedMin = differenceMin.toString().padStart(2, '0');
+
+        return `${differenceHours}:${formattedMin}`;
+    } else {
+        // Calculate the time until the next high tariff
+        const nextHighTarifStartMoment = highTarifStartMoment.clone();
+        if (nextHighTarifStartMoment.isBefore(currTime)) {
+            nextHighTarifStartMoment.add(1, 'day'); // Move to the next day
+        }
+        const diff = moment.duration(nextHighTarifStartMoment.diff(currTime));
+        const differenceHours = diff.hours().toString().padStart(2, '0');
+        const differenceMin = diff.minutes().toString().padStart(2, '0');
+
+        return `${differenceHours}:${differenceMin}`;
+    }
 };
 
-const isCurrentlyHighTarif = (highTarifStart: string[], highTarifEnd: string[]) => {
+// Function to check the current tariff price
+export const getCurrentTariffPrice = (currentDateTime: Date) => {
+    const currentTime = moment(currentDateTime);
+    const dayOfWeek = currentTime.day();
+    const currentTimeStr = currentTime.format('HH:mm');
 
-    const now = new Date();
-    const start = new Date(now);
-    const end = new Date(now);
+    // Default to low tariff
+    let currentTariff = "Niedertarif";
 
-    const [startHours, startMinutes, startSeconds] = highTarifStart.map(Number);
-    const [endHours, endMinutes, endSeconds] = highTarifEnd.map(Number);
+    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        // Weekdays (Monday to Friday)
+        const highTariffStartTime = "07:00";
+        const highTariffEndTime = "20:00";
 
-    start.setHours(startHours, startMinutes, startSeconds, 0);
-    end.setHours(endHours, endMinutes, endSeconds, 0);
+        if (currentTimeStr >= highTariffStartTime && currentTimeStr <= highTariffEndTime) {
+            currentTariff = "Hochtarif";
+        }
+    }
 
-    return now >= start && now <= end;
+    // Get the tariff details from the JSON data
+    const tariffDetails = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"][currentTariff];
 
-}
+    if (tariffDetails) {
+        // Get the tariff price from the details
+        const tariffPrice = tariffDetails["Rp./kWh"];
+        Hochtarif = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Rp./kWh"];
+        Niedertarif = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Niedertarif"]["Rp./kWh"];
+        return tariffPrice;
+    }
 
-export const convertPriceRpToFr = (priceInRp) => {
+    // Return a default value if tariff details are not found
+    return 0.0;
+};
+
+
+// Function to check if currently in high tariff (HT)
+ const convertPriceRpToFr = (priceInRp) => {
     return `${priceInRp / 100}Fr`;
 }
 
+export const currTarifPriceInRp = getCurrentTariffPrice(new Date());
+
+
 const Header = (props) => {
-//    const data = require('./data.json');
-    const currTarifPriceInRp = 25;
-    const savedCashMoney = 302;
+
+    // Define the savedCashMoney state variable and a function to update it
+    const [savedCashMoney, setSavedCashMoney] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
+
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();
+
+    // Function to increment savedCashMoney
+    const incrementSavedCashMoney = (x) => {
+        const updatedCashMoney = savedCashMoney + x; // You can adjust the increment value as needed
+        setSavedCashMoney(updatedCashMoney);
+    };
+
 
     return (
         <View style={{ ...props.style, ...styles.container }}>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>{emojiPrice}</Text>
-                <Text style={styles.headerText}>{currTarifPriceInRp} Rp</Text>
+                <HeaderItem props={styles.headerGroups} emoji={emojiPrice} text={currTarifPriceInRp + " Rp"} modalExplanation={"Aktueller Tarif"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>🤑</Text>
-                <Text style={styles.headerText}>{savedCashMoney} Fr</Text>
+                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={savedCashMoney + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <Text style={styles.headerText}>🕤</Text>
-                <Text style={styles.headerText}>{timeUntilOtherTarif}</Text>
+                <HeaderItem props={styles.headerGroups} emoji={"🕤"} text={timeUntilOtherTarif} modalExplanation={"Stunden bis zum Tarifwechsel"}></HeaderItem>
             </View>
         </View>
     );
@@ -81,8 +142,6 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         paddingVertical: 10,
         paddingHorizontal: 30,
-        paddingBottomColor: 'black',
-        borderBottomWidth: 1,
         backgroundColor: "#a3a3a3"
     },
     headerGroups: {
@@ -90,5 +149,26 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 24,
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
 });
