@@ -73,6 +73,10 @@ const EntryList = ({incrementSavedCashMoney}) => {
         return deviceConsumptionData.GeräteVerbrauch[entryName]
     };
 
+    function removeEntry(item: any) {
+        setData(data.filter(itemArr => itemArr.name !== item.name));
+    }
+
     return (
         <View style={styles.container}>
             <View style={{ ...styles.flatListContainer }}>
@@ -89,13 +93,19 @@ const EntryList = ({incrementSavedCashMoney}) => {
                                 <EntryListText style={{ marginTop: 13, ...styles.entryListItemName}} text={calcSavings(item)+" Rp"}></EntryListText>
                                 <Pressable
                                     style={styles.pressableDeleteButton}
+                                    onPress={() => {
+                                        removeEntry(item)
+                                    }}
                                 >
                                     <EntryListText style={{}} text={"-"}></EntryListText>
                                 </Pressable>
 
                                 <Pressable
                                     style={styles.pressableAddButton}
-                                    onPress={() => incrementSavedCashMoney(calcSavings(item))}
+                                    onPress={() => {
+                                        incrementSavedCashMoney(calcSavings(item));
+                                        removeEntry(item)
+                                    }}
                                 >
                                     <EntryListText style={{}} text={"+"}></EntryListText>
                                 </Pressable>

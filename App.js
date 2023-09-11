@@ -7,7 +7,7 @@ import EntryList from "./Components/Entry/EntryList";
 export default function App() {
 
 
-    const [savedCashMoney, setSavedCashMoney] = useState(0);
+    const [savedCashMoney, setSavedCashMoney] = useState(5400);
 
     // Function to increment savedCashMoney
     const incrementSavedCashMoney = (updatedCashMoney) => {
