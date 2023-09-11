@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Text, View, StyleSheet, Modal, Pressable} from 'react-native';
 import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
 import moment from 'moment-timezone';
@@ -11,6 +11,32 @@ const getEmojiFromPrice = (currPrice) => {
 
 export let Hochtarif = undefined;
 export let Niedertarif = undefined;
+
+
+let addValue = 0;
+
+export const setAddValue = (val) => {
+    addValue = val;
+}
+
+export function useOnChange<T>(
+    value: T,
+    effect: (prev: T, next: T) => void
+) {
+    const latestValue = useRef(value)
+    const callback = useRef(effect)
+    callback.current = effect
+
+    useEffect(
+        function onChange() {
+            if (value !== latestValue.current) {
+                callback.current(latestValue.current, value)
+                latestValue.current = value; // Update the latest value
+            }
+        },
+        [value]
+    )
+}
 
 export const currentlyInHighTarif = () => {
     const highTarifData = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Zeit"];
@@ -115,6 +141,11 @@ const Header = (props) => {
         const updatedCashMoney = savedCashMoney + x; // You can adjust the increment value as needed
         setSavedCashMoney(updatedCashMoney);
     };
+
+    useOnChange(addValue, (prev, next) => {
+        alert(next);
+        incrementSavedCashMoney(next)
+    });
 
 
     return (

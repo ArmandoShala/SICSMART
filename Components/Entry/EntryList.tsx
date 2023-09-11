@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import EntryListText from "./EntryListText";
-import {Hochtarif, Niedertarif} from "../Header/Header";
+import {Hochtarif, Niedertarif, setAddValue} from "../Header/Header";
 
 export const getEntries = () => {
     return [
@@ -91,14 +91,13 @@ const EntryList = () => {
                                 <EntryListText style={{ marginTop: 13, ...styles.entryListItemName}} text={calcSavings(item)+" Rp/kWh"}></EntryListText>
                                 <Pressable
                                     style={styles.pressableDeleteButton}
-                                    onPress={() => calcSavings(item)}
                                 >
                                     <EntryListText style={{}} text={"-"}></EntryListText>
                                 </Pressable>
 
                                 <Pressable
                                     style={styles.pressableAddButton}
-                                    onPress={() => calcSavings(item)}
+                                    onPress={() => setAddValue(calcSavings(item))}
                                 >
                                     <EntryListText style={{}} text={"+"}></EntryListText>
                                 </Pressable>
