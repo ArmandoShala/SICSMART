@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import EntryListItem from './EntryListItem';
 import SelectDropdown from 'react-native-select-dropdown';
+import EntryListText from "./EntryListText";
+import {Hochtarif, Niedertarif} from "../Header/Header";
 
 export const getEntries = () => {
     return [
@@ -13,6 +14,33 @@ export const getEntries = () => {
 };
 
 const deviceConsumptionData = require('../../assets/energieverbrauch_geraete.json');
+
+
+const translatePrioritiesToIcon = (priority: string) => {
+    switch (priority) {
+        case 'High':
+            return '‼️';
+        case 'Medium':
+            return '❗';
+        case 'Low':
+            return '❕';
+        case 'None':
+        default:
+            return '';
+    }
+}
+
+const calcSavings = (item) => {
+    const deviceConsumptionData = require('../../assets/energieverbrauch_geraete.json');
+    const precision = Math.pow(10, 2);
+    return Math.round(deviceConsumptionData.GeräteVerbrauch[item.name] * (Hochtarif - Niedertarif) * precision) / precision
+}
+
+const calcStartTimeOfEntry = (startTime: string) => {
+    return startTime;
+}
+
+
 
 const EntryList = () => {
     const [entryName, setEntryName] = useState('');
@@ -52,8 +80,34 @@ const EntryList = () => {
             <View style={{ ...styles.flatListContainer }}>
                 <FlatList
                     data={data}
-                    renderItem={({ item }) => <EntryListItem item={item} />}
+                    renderItem={({ item }) => (
+                        <View style={styles.containerEntryListItem}>
+                            <View style={styles.row}>
+                                <EntryListText style={styles.entryListItemName} text={item.name}></EntryListText>
+                                <EntryListText style={{}} text={translatePrioritiesToIcon(item.priority)}></EntryListText>
+                                <EntryListText style={{}} text={calcStartTimeOfEntry(item.startTime)}></EntryListText>
+                            </View>
+                            <View style={styles.row}>
+                                <EntryListText style={{ marginTop: 13, ...styles.entryListItemName}} text={calcSavings(item)+" Rp/kWh"}></EntryListText>
+                                <Pressable
+                                    style={styles.pressableDeleteButton}
+                                    onPress={() => calcSavings(item)}
+                                >
+                                    <EntryListText style={{}} text={"-"}></EntryListText>
+                                </Pressable>
+
+                                <Pressable
+                                    style={styles.pressableAddButton}
+                                    onPress={() => calcSavings(item)}
+                                >
+                                    <EntryListText style={{}} text={"+"}></EntryListText>
+                                </Pressable>
+
+                            </View>
+                        </View>
+                    )}
                 />
+
             </View>
             <View style={ styles.addSectionContainer }>
                 <SelectDropdown
@@ -152,6 +206,45 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
     },
+
+    containerEntryListItem: {
+        flex: 1, // To make the container take up the entire screen
+        flexDirection: 'column', // Default is column, but you can change it if needed
+        padding: 20, // Add padding as needed
+        margin: 7,
+        height: 110,
+        borderWidth: 1.2, // Add a border between items (optional)
+        borderColor: 'lightgray', // Border color (optional)
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: "space-between",
+    },
+    pressableAddButton: {
+        flex: 0,
+        height: 45,
+        width: 45,
+        padding: 5,
+        margin: 5,
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'green',
+    },
+    pressableDeleteButton: {
+        flex: 0,
+        height: 45,
+        width: 45,
+        padding: 5,
+        margin: 5,
+        borderRadius: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'red',
+    },
+    entryListItemName: {
+        minWidth: "60%"
+    }
 });
 
 export enum EntryPriority {
