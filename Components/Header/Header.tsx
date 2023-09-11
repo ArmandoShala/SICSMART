@@ -12,32 +12,6 @@ const getEmojiFromPrice = (currPrice) => {
 export let Hochtarif = undefined;
 export let Niedertarif = undefined;
 
-
-let addValue = 0;
-
-export const setAddValue = (val) => {
-    addValue = val;
-}
-
-export function useOnChange<T>(
-    value: T,
-    effect: (prev: T, next: T) => void
-) {
-    const latestValue = useRef(value)
-    const callback = useRef(effect)
-    callback.current = effect
-
-    useEffect(
-        function onChange() {
-            if (value !== latestValue.current) {
-                callback.current(latestValue.current, value)
-                latestValue.current = value; // Update the latest value
-            }
-        },
-        [value]
-    )
-}
-
 export const currentlyInHighTarif = () => {
     const highTarifData = tariffData["Elektrizitätstarif für feste Endverbraucher"]["EKZ Mixstrom"]["Hochtarif"]["Zeit"];
     const highTarifStartWeekday = highTarifData["Montag bis Freitag"]["Startzeit"];
@@ -121,40 +95,26 @@ export const getCurrentTariffPrice = (currentDateTime: Date) => {
 
 // Function to check if currently in high tariff (HT)
  const convertPriceRpToFr = (priceInRp) => {
-    return `${priceInRp / 100}Fr`;
+     let round = (n, p = 2) => (e => Math.round(n * e) / e)(Math.pow(10, p))
+
+    return `${round(priceInRp / 100, 2)}`;
 }
 
-export const currTarifPriceInRp = getCurrentTariffPrice(new Date());
+const currTarifPriceInRp = getCurrentTariffPrice(new Date());
 
 
-const Header = (props) => {
-
-    // Define the savedCashMoney state variable and a function to update it
-    const [savedCashMoney, setSavedCashMoney] = useState(0);
-    const [modalVisible, setModalVisible] = useState(false);
+const Header = ({props, savedCashMoney}) => {
 
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();
 
-    // Function to increment savedCashMoney
-    const incrementSavedCashMoney = (x) => {
-        const updatedCashMoney = savedCashMoney + x; // You can adjust the increment value as needed
-        setSavedCashMoney(updatedCashMoney);
-    };
-
-    useOnChange(addValue, (prev, next) => {
-        alert(next);
-        incrementSavedCashMoney(next)
-    });
-
-
     return (
-        <View style={{ ...props.style, ...styles.container }}>
+        <View style={{ ...styles.container }}>
             <View style={styles.headerGroups}>
                 <HeaderItem props={styles.headerGroups} emoji={emojiPrice} text={currTarifPriceInRp + " Rp"} modalExplanation={"Aktueller Tarif"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={savedCashMoney + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
+                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={convertPriceRpToFr(savedCashMoney) + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
                 <HeaderItem props={styles.headerGroups} emoji={"🕤"} text={timeUntilOtherTarif} modalExplanation={"Stunden bis zum Tarifwechsel"}></HeaderItem>

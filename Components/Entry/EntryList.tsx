@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import EntryListText from "./EntryListText";
-import {Hochtarif, Niedertarif, setAddValue} from "../Header/Header";
+import {Hochtarif, Niedertarif} from "../Header/Header";
 
 export const getEntries = () => {
     return [
@@ -40,9 +40,7 @@ const calcStartTimeOfEntry = (startTime: string) => {
     return startTime;
 }
 
-
-
-const EntryList = () => {
+const EntryList = ({incrementSavedCashMoney}) => {
     const [entryName, setEntryName] = useState('');
     const [selectedPriority, setSelectedPriority] = useState(EntryPriority.None);
     const [data, setData] = useState(getEntries());
@@ -88,7 +86,7 @@ const EntryList = () => {
                                 <EntryListText style={{}} text={calcStartTimeOfEntry(item.startTime)}></EntryListText>
                             </View>
                             <View style={styles.row}>
-                                <EntryListText style={{ marginTop: 13, ...styles.entryListItemName}} text={calcSavings(item)+" Rp/kWh"}></EntryListText>
+                                <EntryListText style={{ marginTop: 13, ...styles.entryListItemName}} text={calcSavings(item)+" Rp"}></EntryListText>
                                 <Pressable
                                     style={styles.pressableDeleteButton}
                                 >
@@ -97,7 +95,7 @@ const EntryList = () => {
 
                                 <Pressable
                                     style={styles.pressableAddButton}
-                                    onPress={() => setAddValue(calcSavings(item))}
+                                    onPress={() => incrementSavedCashMoney(calcSavings(item))}
                                 >
                                     <EntryListText style={{}} text={"+"}></EntryListText>
                                 </Pressable>

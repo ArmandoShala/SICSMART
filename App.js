@@ -1,10 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {AppRegistry, StatusBar, StyleSheet, Text, View} from 'react-native';
 import Header from "./Components/Header/Header";
 import EntryList from "./Components/Entry/EntryList";
 
 
 export default function App() {
+
+
+    const [savedCashMoney, setSavedCashMoney] = useState(0);
+
+    // Function to increment savedCashMoney
+    const incrementSavedCashMoney = (updatedCashMoney) => {
+        updatedCashMoney += savedCashMoney;
+        setSavedCashMoney(updatedCashMoney);
+    };
 
 
     const data = [
@@ -16,8 +25,8 @@ export default function App() {
     return (
         <View style={styles.container}>
             <StatusBar style="auto" />
-            <Header style={styles.header}></Header>
-            <EntryList style={styles.entryList} data={data}></EntryList>
+            <Header savedCashMoney={savedCashMoney}></Header>
+            <EntryList style={styles.entryList} data={data} incrementSavedCashMoney={incrementSavedCashMoney} savedCashMoney={savedCashMoney}></EntryList>
         </View>
     );
 }
