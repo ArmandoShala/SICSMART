@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Text, View, StyleSheet, Modal, Pressable} from 'react-native';
 import tariffData from '../../assets/electricity_costs/zuerich_costs.json';
 import moment from 'moment-timezone';
@@ -95,35 +95,26 @@ export const getCurrentTariffPrice = (currentDateTime: Date) => {
 
 // Function to check if currently in high tariff (HT)
  const convertPriceRpToFr = (priceInRp) => {
-    return `${priceInRp / 100}Fr`;
+     let round = (n, p = 2) => (e => Math.round(n * e) / e)(Math.pow(10, p))
+
+    return `${round(priceInRp / 100, 2)}`;
 }
 
-export const currTarifPriceInRp = getCurrentTariffPrice(new Date());
+const currTarifPriceInRp = getCurrentTariffPrice(new Date());
 
 
-const Header = (props) => {
-
-    // Define the savedCashMoney state variable and a function to update it
-    const [savedCashMoney, setSavedCashMoney] = useState(0);
-    const [modalVisible, setModalVisible] = useState(false);
+const Header = ({props, savedCashMoney}) => {
 
     const emojiPrice = getEmojiFromPrice(currTarifPriceInRp);
     const timeUntilOtherTarif = currentlyInHighTarif();
 
-    // Function to increment savedCashMoney
-    const incrementSavedCashMoney = (x) => {
-        const updatedCashMoney = savedCashMoney + x; // You can adjust the increment value as needed
-        setSavedCashMoney(updatedCashMoney);
-    };
-
-
     return (
-        <View style={{ ...props.style, ...styles.container }}>
+        <View style={{ ...styles.container }}>
             <View style={styles.headerGroups}>
                 <HeaderItem props={styles.headerGroups} emoji={emojiPrice} text={currTarifPriceInRp + " Rp"} modalExplanation={"Aktueller Tarif"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
-                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={savedCashMoney + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
+                <HeaderItem props={styles.headerGroups} emoji={"🤑"} text={convertPriceRpToFr(savedCashMoney) + " Fr"} modalExplanation={"Total gespart bis jetzt"}></HeaderItem>
             </View>
             <View style={styles.headerGroups}>
                 <HeaderItem props={styles.headerGroups} emoji={"🕤"} text={timeUntilOtherTarif} modalExplanation={"Stunden bis zum Tarifwechsel"}></HeaderItem>
